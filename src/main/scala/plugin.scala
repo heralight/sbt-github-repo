@@ -7,6 +7,7 @@ import com.typesafe.sbt.SbtGit.GitKeys._
 import com.typesafe.sbt.git.GitRunner
 
 trait GithubRepoKeys {
+  val useForcePush = SettingKey[String]("use-force-push")
   val localRepo = SettingKey[File]("local-repo")
   val githubRepo = SettingKey[String]("github-repo")
   val createRepo = TaskKey[Unit]("create-repo")
@@ -15,8 +16,11 @@ trait GithubRepoKeys {
 
 object GithubRepoPlugin extends Plugin with GithubRepoKeys {
   def createRepoTask(r: GitRunner, l: File, g: String, s: TaskStreams) {
+
     def git(args: String*) = r(args:_*)(l, s.log)
+
     if (l / ".git" exists) return
+
     git("init")
     l / "index.html" createNewFile()
     git("add", ".")
@@ -34,7 +38,11 @@ object GithubRepoPlugin extends Plugin with GithubRepoKeys {
     def git(args: String*) = r(args:_*)(l, s.log)
     git("add", ".")
     git("commit", "-a", "-m", "publish by sbt-github-repo")
-    git("push", "origin", "gh-pages")
+
+    if (useForcePush.equals("true")) 
+	  git("push", "-f", "origin", "gh-pages")
+    else
+	  git("push", "origin", "gh-pages")
   }
 
   def localPublishTo(v: String, l: File) =

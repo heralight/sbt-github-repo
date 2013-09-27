@@ -2,11 +2,13 @@ seq(githubRepoSettings: _*)
 
 sbtPlugin := true
 
-localRepo := baseDirectory.value
+localRepo := baseDirectory.value / "target" / "maven"
 
 githubRepo := "git@github.com:suikwasha/sbt-github-repo.git"
 
-organization := "com.github.hexx"
+organization := "com.github.suikwasha"
+
+useForcePush := "true"
 
 name := "sbt-github-repo"
 

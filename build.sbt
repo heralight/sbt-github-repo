@@ -17,9 +17,4 @@ libraryDependencies <++= (scalaVersion, sbtBinaryVersion) { (scalaV, sbtV) => Se
   "org.mockito" % "mockito-all" % "1.9.0" % "test"
 )}
 
-scalacOptions in Test ++= Seq("-Yrangepos")
-
-resolvers ++= Seq("snapshots" at "http://oss.sonatype.org/content/repositories/snapshots",
-  "releases" at "http://oss.sonatype.org/content/repositories/releases")
-
 publishMavenStyle := false

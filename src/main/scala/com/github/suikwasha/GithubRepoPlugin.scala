@@ -3,13 +3,10 @@ package com.github.suikwasha
 import sbt._
 import sbt.Keys._
 
-import com.typesafe.sbt.SbtGit.GitKeys._
 import com.typesafe.sbt.git.GitRunner
-import org.eclipse.jgit.api.{ListBranchCommand, InitCommand, Git}
-import org.eclipse.jgit.storage.file.FileRepositoryBuilder
+import org.eclipse.jgit.api.{ListBranchCommand, Git}
 import scala.collection.JavaConversions
-import org.eclipse.jgit.lib.{RefUpdate, ObjectId, Ref}
-import org.eclipse.jgit.transport.RemoteConfig
+import org.eclipse.jgit.transport.RefSpec
 
 trait GithubRepoKeys {
   val localRepo = SettingKey[File]("local-repo")
@@ -30,11 +27,11 @@ object GithubRepoPlugin extends Plugin with GithubRepoKeys {
     init.call()
   }
 
-  def listRemoteRepository(implicit gw: GitWrapper): Seq[String] = {
+  def listRemoteRepository(implicit gw: GitWrapper): Map[String, String] = {
     val jgit = gw.jgit
     val config = jgit.getRepository.getConfig
-    val remotes = JavaConversions.asScalaBuffer(RemoteConfig.getAllRemoteConfigs(config))
-    remotes.map(_.getName)
+    val remotes = JavaConversions.asScalaSet(config.getSubsections("remote"))
+    remotes.map(n => n -> config.getString("remote", n, "url")).toMap
   }
 
   def createBranch(branchName: String)(implicit gw: GitWrapper) = {
@@ -53,16 +50,28 @@ object GithubRepoPlugin extends Plugin with GithubRepoKeys {
 
   def addRemoteRepository(remote: String, url: String)(implicit gw: GitWrapper) = {
     val remotes = listRemoteRepository
-    if(!remotes.contains(Origin)) {
+    if(remotes.get(remote).isEmpty) {
       val jgit = gw.jgit
       val config = jgit.getRepository.getConfig
-      config.setString("remote", Origin, "url", gw.remote)
+      config.setString("remote", remote, "url", url)
       true
     } else {
       false
     }
   }
 
-  private def gitRunnerWithLogger(gitRunner: GitRunner, repo: File, s: TaskStreams)(args: String*) =
-    gitRunner(args: _*)(repo, s.log)
+  def checkout(branchName: String)(implicit gw: GitWrapper) = {
+    val jgit = gw.jgit
+    val checkoutCommand = jgit.checkout
+    checkoutCommand.setName(branchName)
+    checkoutCommand.call
+  }
+
+  def push(remote: String, branch: String)(implicit gw: GitWrapper) = {
+    val jgit = gw.jgit
+    val pushCommand = jgit.push
+    pushCommand.setRemote(remote)
+    pushCommand.setRefSpecs(new RefSpec(branch + ":" + branch))
+    pushCommand.call
+  }
 }

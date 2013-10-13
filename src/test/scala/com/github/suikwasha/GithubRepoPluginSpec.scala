@@ -15,16 +15,16 @@ import java.nio.file.Files
 
 class GithubRepoPluginSpec extends Specification with Mockito {
 
-  val tempDirectory = Files.createTempDirectory("temp").toFile
+  val tempDirectoryPath = Files.createTempDirectory("temp")
 
-  lazy val tearDown = FileUtils.deleteDirectory(tempDirectory)
+  lazy val tearDown = FileUtils.deleteDirectory(tempDirectoryPath.toFile)
 
   override def map(fs: => Fragments) = fs ^ Step(tearDown)
 
   args(sequential = true)
   "createRepositoryTask" should {
     "ディレクトリを渡して正しくレポジトリを作成できる" in {
-      val emptyDir: sbt.File = tempDirectory
+      val emptyDir: sbt.File = Files.createTempDirectory(tempDirectoryPath, "temp").toFile
 
       (emptyDir / ".git").exists.mustEqual(false)
 
@@ -36,9 +36,10 @@ class GithubRepoPluginSpec extends Specification with Mockito {
       git.add().addFilepattern("*").call()
       git.commit().setMessage("initial commit").call()
 
+      val tsMock = mock[TaskStreams]
+      implicit val gw = new GitWrapper(git, emptyDir, "remote", tsMock)
+
       "空のブランチを正しく作成できる" in {
-        val tsMock = mock[TaskStreams]
-        implicit val gw = new GitWrapper(git, emptyDir, "remote", tsMock)
 
         val beforeCreateBranch = git.branchList()
         JavaConversions.asScalaBuffer(beforeCreateBranch.call()) must have size 1
@@ -47,6 +48,44 @@ class GithubRepoPluginSpec extends Specification with Mockito {
 
         val afterCreateBranch = git.branchList()
         JavaConversions.asScalaBuffer(afterCreateBranch.call()) must have size 2
+      }
+
+      "リモートレポジトリを登録できる" in {
+        val beforeAddRemote = GithubRepoPlugin.listRemoteRepository
+        val testRemote = "origin"
+        val testUrl = "git@example.com:testrepo"
+
+        beforeAddRemote.get(testRemote) must beNone
+
+        GithubRepoPlugin.addRemoteRepository(testRemote, testUrl)
+
+        val afterAddRemote = GithubRepoPlugin.listRemoteRepository
+
+        afterAddRemote.get(testRemote) must beSome(testUrl)
+      }
+
+      "ブランチを変更できる" in {
+        val beforeBranch = git.getRepository.getBranch
+
+        GithubRepoPlugin.checkout("gh-pages")
+
+        val afterBranch = git.getRepository.getBranch
+
+        afterBranch mustNotEqual(beforeBranch)
+        afterBranch mustEqual("gh-pages")
+      }
+
+      "リモートブランチにpushすることができる." in {
+        val remoteRepoDir: sbt.File = Files.createTempDirectory(tempDirectoryPath, "temp").toFile
+
+        (remoteRepoDir / ".git").exists.mustEqual(false)
+
+        val remoteRepo = GithubRepoPlugin.createRepositoryTask(remoteRepoDir)
+        GithubRepoPlugin.addRemoteRepository("test", remoteRepoDir.getAbsolutePath)
+
+        GithubRepoPlugin.push("test", "master")
+
+        val afterPushCommits = JavaConversions.iterableAsScalaIterable(remoteRepo.log.all().call)
       }
     }
   }

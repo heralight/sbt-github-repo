@@ -1,4 +1,4 @@
-# sbt-github-repo
+# a fork of sbt-github-repo
 
 creates your own Maven repository on Github.
 

@@ -1,33 +1,21 @@
 # a fork of sbt-github-repo
 
-creates your own Maven repository on Github.
+creates your own Maven/ivy repository on Github.
 
 ## Installation
 
-Add the following to `project/plugins.sbt`.
+Add the following to `project/plugins.sbt` or `~/.sbt/plugins/plugins.sbt` file:
 
     resolvers ++= Seq(
-      "jgit-repo" at "http://download.eclipse.org/jgit/maven",
-      "hexx-releases" at "http://hexx.github.io/maven/releases"
+        "jgit-repo" at "http://download.eclipse.org/jgit/maven",
+        "sbt-github-repo" at "http://suikwasha.github.io/sbt-github-repo"
     )
 
-    addSbtPlugin("com.github.hexx" % "sbt-github-repo" % "0.1.0")
+    addSbtPlugin("com.github.suikwasha" % "sbt-github-repo" % "0.1.1")
 
 ## Publishing
 
-If you want to create a repository on https://github.com/hexx/repo and a local repository on `~/github/repo`,
-add the following to `build.sbt`.
+If you want to create a repository on `git@github.com/suikwasha/repo`
 
-    seq(githubRepoSettings: _*)
-
-    localRepo := Path.userHome / "github" / "repo
-
-    githubRepo := "git@github.com:hexx/repo.git"
-
-Run `sbt publish-to-github-repo` to publish your artifacts.
-
-## Resolvers
-
-Users of your artifacts have to add the following to `resolvers`.
-
-    resolvers += "hexx-releases" at "http://hexx.github.io/repo/releases"
+Run `sbt publish-ghrepo git@github.com/suikwasha/repo` to publish your artifacts.
+plugin creates branch `gh-pages` automatically.

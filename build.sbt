@@ -1,6 +1,6 @@
 sbtPlugin := true
 
-organization := "com.github.suikwasha"
+organization := "com.timesprint"
 
 name := "sbt-githubrepo-plugin"
 

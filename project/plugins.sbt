@@ -4,5 +4,3 @@ resolvers ++= Seq(
 )
 
 addSbtPlugin("com.typesafe.sbt" % "sbt-git" % "0.6.2")
-
-addSbtPlugin("com.github.hexx" % "sbt-github-repo" % "0.1.0")

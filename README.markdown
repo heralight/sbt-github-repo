@@ -6,16 +6,13 @@ creates your own Maven/ivy repository on Github.
 
 Add the following to `project/plugins.sbt` or `~/.sbt/plugins/plugins.sbt` file:
 
-    resolvers ++= Seq(
-        "jgit-repo" at "http://download.eclipse.org/jgit/maven",
-        "sbt-github-repo" at "http://newhoggy.github.io/sbt-github-repo"
-    )
+    resolvers += "sbt-github-repo" at "http://sbt-github-repo.fever.ch"
 
-    addSbtPlugin("com.timesprint" % "sbt-github-repo" % "0.1.1")
+    addSbtPlugin("ch.fever" % "sbt-githubrepo-plugin" % "0.1.1")
 
 ## Publishing
 
 If you want to create a repository on `git@github.com/newhoggy/repo`
 
-Run `sbt publish-ghrepo git@github.com/newhoggy/repo` to publish your artifacts.
+Run `sbt publish-ghrepo git@github.com/path/to/your/repo` to publish your artifacts.
 plugin creates branch `gh-pages` automatically.

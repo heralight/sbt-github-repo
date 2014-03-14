@@ -1,4 +1,4 @@
-# a fork of sbt-github-repo
+# another fork of sbt-github-repo
 
 creates your own Maven/ivy repository on Github.
 
@@ -12,7 +12,7 @@ Add the following to `project/plugins.sbt` or `~/.sbt/plugins/plugins.sbt` file:
 
 ## Publishing
 
-If you want to create a repository on `git@github.com/newhoggy/repo`
+If you want to create a repository on `git@github.com/username/repo`
 
-Run `sbt publish-ghrepo git@github.com/path/to/your/repo` to publish your artifacts.
+Run `sbt publish-ghrepo git@github.com/username/repo` to publish your artifacts.
 plugin creates branch `gh-pages` automatically.

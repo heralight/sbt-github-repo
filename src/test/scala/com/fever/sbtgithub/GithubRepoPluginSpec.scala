@@ -1,4 +1,4 @@
-package com.github.suikwasha
+package com.fever.sbtgithub
 
 import sbt._
 

@@ -1,12 +1,12 @@
 sbtPlugin := true
 
-organization := "com.timesprint"
+organization := "ch.fever"
 
 name := "sbt-githubrepo-plugin"
 
 version := "0.1.1"
 
-crossScalaVersions := Seq("2.10.1", "2.9.3", "2.9.2")
+crossScalaVersions := Seq("2.10.3", "2.9.3", "2.9.2")
 
 libraryDependencies ++= Seq(
   "org.eclipse.jgit" % "org.eclipse.jgit.pgm" % "2.2.0.201212191850-r",

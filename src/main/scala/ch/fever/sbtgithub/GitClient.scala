@@ -1,4 +1,4 @@
-package com.github.suikwasha
+package com.fever.sbtgithub
 
 trait GitClient {
   def commit(message: String): Boolean

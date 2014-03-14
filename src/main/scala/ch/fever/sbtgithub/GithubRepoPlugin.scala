@@ -1,4 +1,4 @@
-package com.github.suikwasha
+package ch.fever.sbtgithub
 
 import sbt._
 import sbt.Keys._
